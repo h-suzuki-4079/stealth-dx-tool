@@ -81,7 +81,7 @@ export const Step1HealthCheck: React.FC<{
       setTotalScore(score);
       
       let resultText = '';
-      let resultType = '';
+      let resultType: 'danger' | 'warning' | 'safe' = 'safe';
       if (score >= 10) {
         resultText = '危険';
         resultType = 'danger';
