@@ -9,16 +9,37 @@ import {
   TrendingDown,
   MessageCircle,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  LucideIcon
 } from 'lucide-react';
 
 type Mode = 'current' | 'result';
+
+interface PersonData {
+  name: string;
+  icon: LucideIcon;
+  workHours: number;
+  overtimeHours: number;
+  sales: number;
+  baseSalary: number;
+  totalSalary: number;
+  comment: string;
+  color: string;
+  overtimePay?: number;
+  productivityBonus?: number;
+  evaluation?: string;
+}
+
+interface ModeData {
+  personA: PersonData;
+  personB: PersonData;
+}
 
 export const Step2EvaluationSimulator: React.FC = () => {
   const [mode, setMode] = useState<Mode>('current');
 
   // 現状の給与規定モード
-  const currentMode = {
+  const currentMode: ModeData = {
     personA: {
       name: 'Aさん（汗かきタイプ）',
       icon: Droplets,
@@ -46,7 +67,7 @@ export const Step2EvaluationSimulator: React.FC = () => {
   };
 
   // 成果配分ルールモード
-  const resultMode = {
+  const resultMode: ModeData = {
     personA: {
       name: 'Aさん（汗かきタイプ）',
       icon: Droplets,
@@ -173,7 +194,7 @@ export const Step2EvaluationSimulator: React.FC = () => {
               <div className="text-sm text-gray-700 space-y-1">
                 <div>基本給: ¥{data.personA.baseSalary.toLocaleString()}</div>
                 <div className="text-red-600 font-semibold">
-                  残業代: +¥{data.personA.overtimePay.toLocaleString()}
+                  残業代: +¥{(data.personA.overtimePay ?? 0).toLocaleString()}
                 </div>
               </div>
             ) : (
@@ -255,10 +276,10 @@ export const Step2EvaluationSimulator: React.FC = () => {
               <div className="text-sm text-gray-700 space-y-1">
                 <div>基本給: ¥{data.personB.baseSalary.toLocaleString()}</div>
                 <div className="text-green-600 font-semibold">
-                  生産性手当: +¥{data.personB.productivityBonus.toLocaleString()}
+                  生産性手当: +¥{(data.personB.productivityBonus ?? 0).toLocaleString()}
                 </div>
                 <div className="text-green-700 font-bold text-lg mt-2">
-                  {data.personB.evaluation}
+                  {data.personB.evaluation ?? ''}
                 </div>
               </div>
             )}
