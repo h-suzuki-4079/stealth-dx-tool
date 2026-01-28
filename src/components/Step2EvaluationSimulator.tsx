@@ -1,318 +1,309 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Slider } from './ui/Slider';
-import { TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { 
+  Droplets, 
+  Sparkles, 
+  Clock, 
+  TrendingUp, 
+  TrendingDown,
+  MessageCircle,
+  AlertCircle,
+  CheckCircle
+} from 'lucide-react';
 
-type Mode = 'showa' | 'reiwa';
+type Mode = 'current' | 'result';
 
 export const Step2EvaluationSimulator: React.FC = () => {
-  const [mode, setMode] = useState<Mode>('reiwa');
-  const [challengeCount, setChallengeCount] = useState(5);
+  const [mode, setMode] = useState<Mode>('current');
 
-  // 昭和モード（減点主義）の計算
-  const calculateShowaMode = () => {
-    // 失敗コストが高く、挑戦回数が増えるほど評価と利益が下がる
-    const failureCost = challengeCount * 15000; // 1回あたりの失敗コスト
-    const baseScore = 100;
-    const penalty = challengeCount * 5; // 挑戦回数が増えるほど減点
-    const evaluationScore = Math.max(0, baseScore - penalty);
-    
-    const baseProfit = 1000000;
-    const companyProfit = Math.max(0, baseProfit - failureCost);
-    
-    return {
-      evaluationScore,
-      companyProfit,
-      successReward: 0,
-      failureCost: -failureCost,
-      message: '失敗コストが高いため、社員は「何もしない」ことが最適解になります。',
-    };
+  // 現状の給与規定モード
+  const currentMode = {
+    personA: {
+      name: 'Aさん（汗かきタイプ）',
+      icon: Droplets,
+      workHours: 10,
+      overtimeHours: 2,
+      sales: 1000000,
+      baseSalary: 200000,
+      overtimePay: 50000,
+      totalSalary: 250000,
+      comment: '残業代で稼ぐぞ！',
+      color: 'red',
+    },
+    personB: {
+      name: 'Bさん（スマートタイプ）',
+      icon: Sparkles,
+      workHours: 5,
+      overtimeHours: 0,
+      sales: 1000000,
+      baseSalary: 200000,
+      overtimePay: 0,
+      totalSalary: 200000,
+      comment: '工夫して早く帰ると給料が減る...バカらしいから明日からゆっくりやろう',
+      color: 'blue',
+    },
   };
 
-  // 令和モード（加点主義）の計算
-  const calculateReiwaMode = () => {
-    // AI活用により失敗コストが無視でき、挑戦回数が増えるほど評価と利益が上がる
-    const successRate = Math.min(0.3, 0.05 + challengeCount * 0.01); // 挑戦回数が増えるほど成功率が上がる
-    const successReward = challengeCount * successRate * 100000; // 成功報酬
-    const failureCost = challengeCount * 1000; // AI活用により失敗コストは低い
-    const evaluationScore = Math.round(challengeCount * 2.5);
-    const companyProfit = Math.round(successReward - failureCost);
-    
-    return {
-      evaluationScore,
-      companyProfit,
-      successReward: Math.round(successReward),
-      failureCost: -failureCost,
-      message: 'AIなら失敗はタダ。数多く試行錯誤した者が「正解」を見つけます。',
-    };
+  // 成果配分ルールモード
+  const resultMode = {
+    personA: {
+      name: 'Aさん（汗かきタイプ）',
+      icon: Droplets,
+      workHours: 10,
+      overtimeHours: 2,
+      sales: 1000000,
+      baseSalary: 200000,
+      productivityBonus: 0,
+      totalSalary: 200000,
+      comment: 'ヤバい、私もツール覚えなきゃ',
+      color: 'gray',
+      evaluation: '効率化の指導対象',
+    },
+    personB: {
+      name: 'Bさん（スマートタイプ）',
+      icon: Sparkles,
+      workHours: 5,
+      overtimeHours: 0,
+      sales: 1000000,
+      baseSalary: 200000,
+      productivityBonus: 80000,
+      totalSalary: 280000,
+      comment: 'もっと効率化してボーナス増やすぞ！',
+      color: 'green',
+      evaluation: '最高評価！',
+    },
   };
 
-  const result = mode === 'showa' ? calculateShowaMode() : calculateReiwaMode();
+  const data = mode === 'current' ? currentMode : resultMode;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-6 py-12">
+    <div className="w-full max-w-6xl mx-auto px-6 py-12">
       <h2 className="text-4xl font-bold text-blue-900 mb-8 text-center">
-        Step 2: 評価制度シミュレーター
+        頑張る人が損をする？ 給与と評価の矛盾チェック
       </h2>
 
       {/* モード切り替えタブ */}
-      <div className="bg-white rounded-2xl p-2 shadow-lg border-2 border-gray-200 mb-6">
+      <div className="bg-white rounded-2xl p-2 shadow-lg border-2 border-gray-200 mb-8">
         <div className="flex gap-2">
           <button
-            onClick={() => setMode('showa')}
+            onClick={() => setMode('current')}
             className={`flex-1 py-4 px-6 rounded-xl font-bold text-xl transition-all duration-300 ${
-              mode === 'showa'
-                ? 'bg-gray-700 text-white shadow-lg'
+              mode === 'current'
+                ? 'bg-red-600 text-white shadow-lg'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
             <div className="flex items-center justify-center gap-2">
               <AlertCircle className="w-6 h-6" />
-              <span>昭和・労働集約モデル（減点主義）</span>
+              <span>[A] 現状の給与規定</span>
             </div>
+            <div className="text-sm mt-1 opacity-90">時間給・年功評価（一般的）</div>
           </button>
           <button
-            onClick={() => setMode('reiwa')}
+            onClick={() => setMode('result')}
             className={`flex-1 py-4 px-6 rounded-xl font-bold text-xl transition-all duration-300 ${
-              mode === 'reiwa'
-                ? 'bg-blue-900 text-white shadow-lg'
-                : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+              mode === 'result'
+                ? 'bg-green-600 text-white shadow-lg'
+                : 'bg-green-100 text-green-600 hover:bg-green-200'
             }`}
           >
             <div className="flex items-center justify-center gap-2">
-              <TrendingUp className="w-6 h-6" />
-              <span>令和・AI活用モデル（加点主義）</span>
+              <CheckCircle className="w-6 h-6" />
+              <span>[B] 成果配分ルール</span>
             </div>
+            <div className="text-sm mt-1 opacity-90">成果給・利益還元（推奨）</div>
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 mb-6">
-        <div className="mb-8">
-          <Slider
-            value={challengeCount}
-            onChange={setChallengeCount}
-            min={0}
-            max={20}
-            step={1}
-            label="業務改善の「実験」回数（プロンプト試行など）"
-          />
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div
-            className={`rounded-xl p-6 border-2 transition-all duration-300 ${
-              mode === 'showa'
-                ? 'bg-gray-50 border-gray-300'
-                : 'bg-blue-50 border-blue-200'
-            }`}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              {mode === 'showa' ? (
-                <TrendingDown className="w-8 h-8 text-gray-700" />
-              ) : (
-                <TrendingUp className="w-8 h-8 text-blue-900" />
-              )}
-              <h3
-                className={`text-xl font-semibold ${
-                  mode === 'showa' ? 'text-gray-700' : 'text-blue-900'
-                }`}
-              >
-                評価スコア
-              </h3>
+      {/* 2人の社員の比較カード */}
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {/* Aさん */}
+        <div className={`bg-white rounded-2xl p-6 shadow-lg border-4 transition-all duration-300 ${
+          mode === 'current' 
+            ? 'border-red-500 bg-red-50' 
+            : 'border-gray-300 bg-gray-50'
+        }`}>
+          <div className="flex items-center gap-4 mb-4">
+            <div className={`p-4 rounded-full ${
+              mode === 'current' ? 'bg-red-200' : 'bg-gray-200'
+            }`}>
+              {React.createElement(data.personA.icon, {
+                className: `w-12 h-12 ${
+                  mode === 'current' ? 'text-red-700' : 'text-gray-600'
+                }`
+              })}
             </div>
-            <p
-              className={`text-5xl font-bold ${
-                mode === 'showa' ? 'text-gray-700' : 'text-blue-900'
-              }`}
-            >
-              {result.evaluationScore}点
-            </p>
-            
-            {/* 評価スコアの内訳 */}
-            <div className="mt-4 space-y-2 pt-4 border-t border-gray-300">
-              {mode === 'showa' ? (
-                <>
-                  <div className="flex items-start gap-2">
-                    <span className="text-red-600">🔴</span>
-                    <div className="flex-1">
-                      <span className="text-sm text-gray-600">
-                        <span className="font-semibold text-red-600">減点：</span>
-                        失敗による手戻りコスト（残業代増）
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-blue-600">🔵</span>
-                    <div className="flex-1">
-                      <span className="text-sm text-gray-600">
-                        <span className="font-semibold text-blue-600">加点：</span>
-                        なし（現状維持が目標）
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-sm text-gray-700 italic">
-                      「余計なことをしてミスするくらいなら、何もしない方がマシ」と判断されます。
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-start gap-2">
-                    <span className="text-red-600">🔴</span>
-                    <div className="flex-1">
-                      <span className="text-sm text-gray-600">
-                        <span className="font-semibold text-red-600">減点：</span>
-                        なし（AIなら試行錯誤はタダ）
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-blue-600">🔵</span>
-                    <div className="flex-1">
-                      <span className="text-sm text-gray-600">
-                        <span className="font-semibold text-blue-600">加点：</span>
-                        発見した「型（プロンプト）」の横展開
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-sm text-gray-700 italic">
-                      「個人の発見をチーム全員の武器（マニュアル）に変えた」ことが高く評価されます。
-                    </p>
-                  </div>
-                </>
-              )}
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">{data.personA.name}</h3>
+              <div className="flex items-center gap-2 mt-1">
+                <Clock className="w-4 h-4 text-gray-600" />
+                <span className="text-sm text-gray-600">
+                  労働時間: {data.personA.workHours}時間
+                  {data.personA.overtimeHours > 0 && (
+                    <span className="text-red-600 font-semibold">
+                      （残業{data.personA.overtimeHours}時間）
+                    </span>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div
-            className={`rounded-xl p-6 border-2 transition-all duration-300 ${
-              mode === 'showa'
-                ? 'bg-gray-50 border-gray-300'
-                : 'bg-green-50 border-green-200'
-            }`}
-          >
-            <h3
-              className={`text-xl font-semibold mb-3 ${
-                mode === 'showa' ? 'text-gray-700' : 'text-green-900'
-              }`}
-            >
-              会社の利益
-            </h3>
-            <p
-              className={`text-5xl font-bold ${
-                mode === 'showa' ? 'text-gray-700' : 'text-green-900'
-              }`}
-            >
-              ¥{result.companyProfit.toLocaleString()}
-            </p>
-            {mode === 'showa' && (
-              <p className="text-sm text-gray-600 mt-2">
-                残業代などのコスト増で利益が減少
+          <div className="mb-4 p-4 bg-white rounded-lg border-2 border-gray-200">
+            <div className="text-sm text-gray-600 mb-1">成果（売上）</div>
+            <div className="text-2xl font-bold text-gray-900">
+              ¥{data.personA.sales.toLocaleString()}
+            </div>
+          </div>
+
+          <div className={`mb-4 p-6 rounded-lg border-4 ${
+            mode === 'current'
+              ? 'bg-red-100 border-red-500'
+              : 'bg-gray-100 border-gray-400'
+          }`}>
+            <div className="text-sm text-gray-600 mb-2">給与（手取り）</div>
+            <div className={`text-5xl font-bold mb-2 ${
+              mode === 'current' ? 'text-red-600' : 'text-gray-700'
+            }`}>
+              ¥{data.personA.totalSalary.toLocaleString()}
+            </div>
+            {mode === 'current' ? (
+              <div className="text-sm text-gray-700 space-y-1">
+                <div>基本給: ¥{data.personA.baseSalary.toLocaleString()}</div>
+                <div className="text-red-600 font-semibold">
+                  残業代: +¥{data.personA.overtimePay.toLocaleString()}
+                </div>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-700">
+                <div>基本給: ¥{data.personA.baseSalary.toLocaleString()}</div>
+                <div className="text-gray-600 mt-2 font-semibold">
+                  {data.personA.evaluation}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 吹き出し */}
+          <div className="bg-white rounded-lg p-4 border-2 border-gray-300 relative">
+            <div className="absolute -top-2 left-6 w-4 h-4 bg-white border-l-2 border-t-2 border-gray-300 transform rotate-45"></div>
+            <div className="flex items-start gap-2">
+              <MessageCircle className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" />
+              <p className="text-sm text-gray-700 italic">
+                「{data.personA.comment}」
               </p>
-            )}
-          </div>
-        </div>
-
-        {/* スコアの内訳 */}
-        <div
-          className={`rounded-xl p-6 border-2 mb-6 transition-all duration-300 ${
-            mode === 'showa'
-              ? 'bg-gray-50 border-gray-300'
-              : 'bg-yellow-50 border-yellow-300'
-          }`}
-        >
-          <h4 className="text-lg font-semibold text-gray-900 mb-3">スコアの内訳</h4>
-          <div className="space-y-2">
-            {mode === 'reiwa' && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-700">成功報酬:</span>
-                <span className="text-green-600 font-bold text-xl">
-                  +¥{result.successReward.toLocaleString()}
-                </span>
-              </div>
-            )}
-            <div className="flex justify-between items-center">
-              <span className="text-gray-700">失敗コスト:</span>
-              <span className="text-red-600 font-bold text-xl">
-                ¥{result.failureCost.toLocaleString()}
-              </span>
             </div>
-            {mode === 'showa' && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-700">減点ペナルティ:</span>
-                <span className="text-red-600 font-bold text-xl">
-                  -{challengeCount * 5}点
-                </span>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* メッセージ */}
-        <div
-          className={`rounded-xl p-6 border-2 transition-all duration-300 ${
-            mode === 'showa'
-              ? 'bg-red-50 border-red-300'
-              : 'bg-blue-50 border-blue-300'
-          }`}
-        >
-          <p
-            className={`text-xl font-semibold text-center ${
-              mode === 'showa' ? 'text-red-900' : 'text-blue-900'
-            }`}
-          >
-            💡 {result.message}
-          </p>
+        {/* Bさん */}
+        <div className={`bg-white rounded-2xl p-6 shadow-lg border-4 transition-all duration-300 ${
+          mode === 'current' 
+            ? 'border-blue-300 bg-blue-50' 
+            : 'border-green-500 bg-green-50'
+        }`}>
+          <div className="flex items-center gap-4 mb-4">
+            <div className={`p-4 rounded-full ${
+              mode === 'current' ? 'bg-blue-200' : 'bg-green-200'
+            }`}>
+              {React.createElement(data.personB.icon, {
+                className: `w-12 h-12 ${
+                  mode === 'current' ? 'text-blue-700' : 'text-green-700'
+                }`
+              })}
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">{data.personB.name}</h3>
+              <div className="flex items-center gap-2 mt-1">
+                <Clock className="w-4 h-4 text-gray-600" />
+                <span className="text-sm text-gray-600">
+                  労働時間: {data.personB.workHours}時間
+                  {data.personB.overtimeHours === 0 && (
+                    <span className="text-green-600 font-semibold">（残業なし）</span>
+                  )}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-4 p-4 bg-white rounded-lg border-2 border-gray-200">
+            <div className="text-sm text-gray-600 mb-1">成果（売上）</div>
+            <div className="text-2xl font-bold text-gray-900">
+              ¥{data.personB.sales.toLocaleString()}
+            </div>
+          </div>
+
+          <div className={`mb-4 p-6 rounded-lg border-4 ${
+            mode === 'current'
+              ? 'bg-blue-100 border-blue-400'
+              : 'bg-green-100 border-green-500'
+          }`}>
+            <div className="text-sm text-gray-600 mb-2">給与（手取り）</div>
+            <div className={`text-5xl font-bold mb-2 ${
+              mode === 'current' ? 'text-blue-600' : 'text-green-600'
+            }`}>
+              ¥{data.personB.totalSalary.toLocaleString()}
+            </div>
+            {mode === 'current' ? (
+              <div className="text-sm text-gray-700">
+                <div>基本給: ¥{data.personB.baseSalary.toLocaleString()}</div>
+                <div className="text-blue-600 mt-2 font-semibold">残業代なし...</div>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-700 space-y-1">
+                <div>基本給: ¥{data.personB.baseSalary.toLocaleString()}</div>
+                <div className="text-green-600 font-semibold">
+                  生産性手当: +¥{data.personB.productivityBonus.toLocaleString()}
+                </div>
+                <div className="text-green-700 font-bold text-lg mt-2">
+                  {data.personB.evaluation}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 吹き出し */}
+          <div className="bg-white rounded-lg p-4 border-2 border-gray-300 relative">
+            <div className="absolute -top-2 left-6 w-4 h-4 bg-white border-l-2 border-t-2 border-gray-300 transform rotate-45"></div>
+            <div className="flex items-start gap-2">
+              <MessageCircle className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" />
+              <p className="text-sm text-gray-700 italic">
+                「{data.personB.comment}」
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* グラフ表示 */}
-      <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-gray-200">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">
-          評価スコアの推移
-        </h3>
-        <div className="h-64 flex items-end justify-between gap-2">
-          {Array.from({ length: 21 }, (_, i) => {
-            let height: number;
-            if (mode === 'showa') {
-              // 昭和モード：右肩下がり
-              const baseScore = 100;
-              const penalty = i * 5;
-              const score = Math.max(0, baseScore - penalty);
-              height = (score / 100) * 100;
-            } else {
-              // 令和モード：右肩上がり
-              height = (i * 2.5) / 50 * 100;
-            }
-            const isActive = i <= challengeCount;
-            return (
-              <div
-                key={i}
-                className={`flex-1 rounded-t transition-all duration-300 ${
-                  isActive
-                    ? mode === 'showa'
-                      ? 'bg-gray-600'
-                      : 'bg-blue-900'
-                    : 'bg-gray-200'
-                }`}
-                style={{ height: `${Math.max(height, 5)}%` }}
-                title={
-                  mode === 'showa'
-                    ? `${i}回: ${Math.max(0, 100 - i * 5)}点`
-                    : `${i}回: ${Math.round(i * 2.5)}点`
-                }
-              />
-            );
-          })}
-        </div>
-        <div className="mt-4 text-sm text-gray-600 text-center">
-          {mode === 'showa'
-            ? '実験回数が増えるほど評価スコアが下がります'
-            : '実験回数に応じて評価スコアが上がります'}
+      {/* まとめメッセージ */}
+      <div className={`rounded-2xl p-8 shadow-lg border-4 transition-all duration-300 ${
+        mode === 'current'
+          ? 'bg-red-50 border-red-300'
+          : 'bg-green-50 border-green-300'
+      }`}>
+        <div className="flex items-start gap-4">
+          {mode === 'current' ? (
+            <TrendingDown className="w-8 h-8 text-red-600 flex-shrink-0 mt-1" />
+          ) : (
+            <TrendingUp className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
+          )}
+          <div>
+            <h3 className={`text-2xl font-bold mb-3 ${
+              mode === 'current' ? 'text-red-900' : 'text-green-900'
+            }`}>
+              {mode === 'current' ? '現状の問題点' : '解決策'}
+            </h3>
+            <p className={`text-xl leading-relaxed ${
+              mode === 'current' ? 'text-red-800' : 'text-green-800'
+            }`}>
+              {mode === 'current' 
+                ? '同じ成果を出しているのに、ダラダラ残業する人の方が給料が高くなる矛盾。これでは効率化を進めるインセンティブが働きません。'
+                : '「時間をかけた人」を評価する限り、会社から無駄作業はなくなりません。浮いたコストを還元する「仕組み」に変えるだけで、社員は自ら動き出します。'
+              }
+            </p>
+          </div>
         </div>
       </div>
     </div>
