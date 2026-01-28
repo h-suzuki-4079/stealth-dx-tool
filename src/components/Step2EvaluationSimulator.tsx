@@ -96,7 +96,7 @@ export const Step2EvaluationSimulator: React.FC = () => {
             min={0}
             max={20}
             step={1}
-            label="社員の挑戦回数（失敗含む）"
+            label="業務改善の「実験」回数（プロンプト試行など）"
           />
         </div>
 
@@ -129,11 +129,63 @@ export const Step2EvaluationSimulator: React.FC = () => {
             >
               {result.evaluationScore}点
             </p>
-            {mode === 'showa' && (
-              <p className="text-sm text-gray-600 mt-2">
-                「またミスしやがって！」と減点される
-              </p>
-            )}
+            
+            {/* 評価スコアの内訳 */}
+            <div className="mt-4 space-y-2 pt-4 border-t border-gray-300">
+              {mode === 'showa' ? (
+                <>
+                  <div className="flex items-start gap-2">
+                    <span className="text-red-600">🔴</span>
+                    <div className="flex-1">
+                      <span className="text-sm text-gray-600">
+                        <span className="font-semibold text-red-600">減点：</span>
+                        失敗による手戻りコスト（残業代増）
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-600">🔵</span>
+                    <div className="flex-1">
+                      <span className="text-sm text-gray-600">
+                        <span className="font-semibold text-blue-600">加点：</span>
+                        なし（現状維持が目標）
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <p className="text-sm text-gray-700 italic">
+                      「余計なことをしてミスするくらいなら、何もしない方がマシ」と判断されます。
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-start gap-2">
+                    <span className="text-red-600">🔴</span>
+                    <div className="flex-1">
+                      <span className="text-sm text-gray-600">
+                        <span className="font-semibold text-red-600">減点：</span>
+                        なし（AIなら試行錯誤はタダ）
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-600">🔵</span>
+                    <div className="flex-1">
+                      <span className="text-sm text-gray-600">
+                        <span className="font-semibold text-blue-600">加点：</span>
+                        発見した「型（プロンプト）」の横展開
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <p className="text-sm text-gray-700 italic">
+                      「個人の発見をチーム全員の武器（マニュアル）に変えた」ことが高く評価されます。
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           <div
@@ -259,8 +311,8 @@ export const Step2EvaluationSimulator: React.FC = () => {
         </div>
         <div className="mt-4 text-sm text-gray-600 text-center">
           {mode === 'showa'
-            ? '挑戦回数が増えるほど評価スコアが下がります'
-            : '挑戦回数に応じて評価スコアが上がります'}
+            ? '実験回数が増えるほど評価スコアが下がります'
+            : '実験回数に応じて評価スコアが上がります'}
         </div>
       </div>
     </div>
